@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Platzi - Api Rest</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="./cover.css" />
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+      <main role="main" class="inner cover">
+        <h1 class="cover-heading">API REST Books</h1>
+        <table id="booksTable" class="table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>ID Autor</th>
+              <th>ID Género</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="messages" class="d-none p-5 mb-1"></div>
+        <input
+          id="loadBooks"
+          class="btn btn-lg btn-secondary"
+          type="button"
+          value="Cargar libros"
+        />
+        <div id="bookForm" class="d-none p-2 text-left">
+          <form id="form">
+            <div class="form-group">
+              <label for="bookTitle">Título:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="bookTitle"
+                name="bookTitle"
+              />
+            </div>
+            <div class="form-group">
+              <label for="bookAuthorId">ID del Autor:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="bookAuthorId"
+                name="bookAuthorId"
+              />
+            </div>
+            <div class="form-group">
+              <label for="bookGenreId">ID del Género:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="bookGenreId"
+                name="bookGenreId"
+              />
+            </div>
+            <p class="text-center">
+              <input
+                type="button"
+                id="bookSave"
+                class="btn btn-primary"
+                value="Guardar"
+              />
+            </p>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="text/javascript">
+      $("#loadBooks").click(function() {
+        $("#messages")
+          .first("p")
+          .text("Cargando libros...");
+        $("#messages").removeClass("d-none");
+        $.ajax({
+          url:
+            window.location.href +
+            (window.location.href.substr(window.location.href.length - 1) == "/"
+              ? ""
+              : "/") +
+            "books",
+          success: function(data) {
+            $("#messages").addClass("d-none");
+            $("#booksTable > tbody").empty();
+            for (book in data) {
+              addBook(data[book]);
+            }
+            $("#bookForm").removeClass("d-none");
+          }
+        });
+      });
+
+      function addBook(book) {
+        console.log(book);
+        $("#booksTable tr:last").after(
+          `<tr><td>${book.titulo}</td><td>${book.autor_id}</td><td>${
+            book.genero_id
+          }</td></tr>`
+        );
+      }
+
+      $("#bookSave").click(function() {
+        let newBook = {
+          titulo: $("#bookTitle").val(),
+          autor_id: $("#bookAuthorId").val(),
+          genero_id: $("#bookGenreId").val()
+        };
+
+        $("#messages")
+          .first("p")
+          .text("Guardando libro...");
+        $("#messages").removeClass("d-none");
+
+        $.ajax({
+          url:
+            window.location.href +
+            (window.location.href.substr(window.location.href.length - 1) == "/"
+              ? ""
+              : "/") +
+            "books",
+          method: "POST",
+          data: JSON.stringify(newBook),
+          success: function(data) {
+            $("#messages").addClass("d-none");
+            addBook(newBook);
+            $("#form").trigger("reset");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
